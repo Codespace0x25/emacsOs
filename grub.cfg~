@@ -1,0 +1,17 @@
+set menu_color_normal=green/black
+set menu_color_highlight=black/green
+
+set timeout=10
+set default=0
+
+
+menuentry "MyOS" {
+	  insmod vbe
+	  insmod vesa
+	  set gfxmode=1024x768
+	  set gfxpayload=1024x768x32
+
+	  terminal_output gfxterm
+    	  multiboot /boot/kernel.bin
+   	  boot
+}

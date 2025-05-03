@@ -1,0 +1,38 @@
+#!/bin/bash
+set -e
+
+IMG=build/os.img
+IMG_SIZE_MB=64
+MOUNT_DIR=build/mnt
+
+echo "[+] Creating empty image..."
+dd if=/dev/zero of=$IMG bs=1M count=$IMG_SIZE_MB
+
+echo "[+] Creating partition table..."
+parted $IMG --script -- mklabel msdos
+parted $IMG --script -- mkpart primary fat32 1MiB 100%
+parted $IMG --script -- set 1 boot on
+
+# Setup loop device
+LOOPDEV=$(sudo losetup --find --show --partscan $IMG)
+PARTITION=${LOOPDEV}p1
+
+echo "[+] Formatting partition as FAT32..."
+sudo mkfs.fat -F 32 $PARTITION
+
+echo "[+] Mounting..."
+sudo mkdir -p $MOUNT_DIR
+sudo mount $PARTITION $MOUNT_DIR
+
+echo "[+] Copying files..."
+sudo mkdir -p $MOUNT_DIR/boot/grub
+sudo cp grub.cfg $MOUNT_DIR/boot/grub/
+sudo cp build/kernel.bin $MOUNT_DIR/boot/
+sudo cp init.v4 $MOUNT_DIR/
+
+echo "[+] Installing GRUB..."
+sudo grub-install --target=i386-pc --boot-directory=$MOUNT_DIR/boot --modules="normal part_msdos fat multiboot" --no-floppy $LOOPDEV
+
+echo "[+] Cleaning up..."
+sudo umount $MOUNT_DIR
+sudo losetup -d $LOOPDEV

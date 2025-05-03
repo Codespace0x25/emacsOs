@@ -1,0 +1,26 @@
+#include "transform.h"
+
+void int_to_string(int value, char *buffer) {
+  char temp[12];
+  int i = 0, is_negative = 0;
+
+  if (value == 0) {
+    buffer[0] = '0';
+    buffer[1] = '\0';
+    return;
+  }
+  if (value < 0) {
+    is_negative = 1;
+    value = -value;
+  }
+  while (value > 0) {
+    temp[i++] = (value % 10) + '0';
+    value /= 10;
+  }
+  if (is_negative)
+    temp[i++] = '-';
+  for (int j = 0;j < i;j++) {
+    buffer[j] = temp[i-j-1];
+  }
+  buffer[i] = '\0';
+}

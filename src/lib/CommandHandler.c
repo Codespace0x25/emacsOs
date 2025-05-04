@@ -168,21 +168,3 @@ void cmd_vim(int argc, char **argv){
   putS("you silly goose, you are running vim on the emacs\n");
 }
 
-void cmd_music(int argc, char **argv){
-  (void) argc;
-  (void) argv;
-
-  pc_beep(1500, 1000);
-  delay(1000);
-  pc_beep(1000, 1000);
-  delay(1000);
-  pc_beep(990, 1000);
-  delay(5000);
-  pc_beep(1000, 1000);
-  delay(5000);
-  pc_beep(1500, 5000);
-  delay(5000);
-  pc_beep(2000, 6000);
-  delay(6000);
-  pc_beep(8992, 6000);
-}

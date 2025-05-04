@@ -32,6 +32,7 @@ void cmd_time(int argc, char **argv);
 void cmd_beep(int argc, char **argv);
 void cmd_poweroff(int argc, char **argv);
 void cmd_vim(int argc, char **argv);
+void cmd_music(int argc, char **argv);
 // --- Command list ---
 static Command commands[] = {
     REGISTER_COMMAND("help", "Show available commands", cmd_help),
@@ -43,6 +44,7 @@ static Command commands[] = {
     REGISTER_COMMAND("poweroff", "suths down the pc", cmd_poweroff),
     REGISTER_COMMAND("exit", "closes the seshioin", cmd_poweroff),
     REGISTER_COMMAND("vim", "vim", cmd_vim),
+    REGISTER_COMMAND("music", "plays a tuen", cmd_music),
 };
 
 static const int command_count = sizeof(commands) / sizeof(commands[0]);
@@ -154,7 +156,7 @@ void cmd_beep(int argc, char **argv) {
     putS(argv[1]);
     putS("\n");
     putS("duration ms: ");
-    putS(argv[1]);
+    putS(argv[2]);
     putS("\n");
 }
 
@@ -164,4 +166,23 @@ void cmd_poweroff(int argc, char **argv){
 
 void cmd_vim(int argc, char **argv){
   putS("you silly goose, you are running vim on the emacs\n");
+}
+
+void cmd_music(int argc, char **argv){
+  (void) argc;
+  (void) argv;
+
+  pc_beep(1500, 1000);
+  delay(1000);
+  pc_beep(1000, 1000);
+  delay(1000);
+  pc_beep(990, 1000);
+  delay(5000);
+  pc_beep(1000, 1000);
+  delay(5000);
+  pc_beep(1500, 5000);
+  delay(5000);
+  pc_beep(2000, 6000);
+  delay(6000);
+  pc_beep(8992, 6000);
 }

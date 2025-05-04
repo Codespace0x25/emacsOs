@@ -34,4 +34,4 @@ void Screen_BackSpace();
 void Screen_MoveCursorBack();
 uint16_t Screen_GetCursorPos();
 
-void print_hex(uint32_t value);
+void printf(const char *fmt, ...) ;

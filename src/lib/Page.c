@@ -2,6 +2,7 @@
 #include "Screen.h"
 #include "std/transform.h"
 
+
 #define PAGE_PRESENT   0x1
 #define PAGE_RW        0x2
 #define PAGE_USER      0x4
@@ -64,4 +65,20 @@ void* alloc_page() {
     void* addr = (void*)next_free_page;
     next_free_page += PAGE_SIZE;
     return addr;
+}
+void paging_map(void* virt, void* phys, uint32_t flags) {
+    uint32_t vaddr = (uint32_t)virt;
+    uint32_t paddr = (uint32_t)phys;
+    uint32_t pd_index = vaddr >> 22;
+    uint32_t pt_index = (vaddr >> 12) & 0x03FF;
+    uint32_t* pt;
+    if (page_directory[pd_index] & PAGE_PRESENT) {
+        pt = (uint32_t*)(page_directory[pd_index] & ~0xFFF);
+    } else {
+        pt = (uint32_t*)alloc_page();
+        for (int i = 0; i < 1024; i++) pt[i] = 0;
+        page_directory[pd_index] = ((uint32_t)pt) | flags | PAGE_PRESENT;
+    }
+    pt[pt_index] = (paddr & ~0xFFF) | flags | PAGE_PRESENT;
+    __asm__ volatile("invlpg (%0)" :: "r"(vaddr) : "memory");
 }

@@ -53,7 +53,7 @@ $(IMG): $(BUILD)/$(TARGET) grub.cfg | makefile
 	cp init.v4 $(BUILD)/iso/bin/
 	grub-mkrescue -o $(IMG) $(BUILD)/iso
 run: $(IMG)  makefile
-	$(QEMU) -drive file=$(IMG),format=raw,if=ide -serial stdio -audiodev pa,id=speaker -machine pcspk-audiodev=speaker
+	$(QEMU) -drive file=$(IMG),format=raw,if=ide -serial stdio -audiodev pa,id=speaker -machine pcspk-audiodev=speaker 
 
 clean:
 	rm -rf $(BUILD)

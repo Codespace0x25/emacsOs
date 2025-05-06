@@ -26,7 +26,12 @@ void delay(uint32_t count){
 }
 
 void pc_beep(uint32_t frek,uint32_t dur){
-  pc_speaker_on(frek);
-  delay(dur);
-  pc_speaker_off();
+  if(frek!=0){
+    pc_speaker_on(frek);
+    delay(dur);
+    pc_speaker_off();
+  }
+  else {
+    delay(dur);
+  }
 }

@@ -10,8 +10,8 @@
 #define VGA_ADDRESS 0xB8000
 typedef __builtin_va_list va_list;
 #define va_start(v, l) __builtin_va_start(v, l)
-#define va_arg(v, t)   __builtin_va_arg(v, t)
-#define va_end(v)      __builtin_va_end(v)
+#define va_arg(v, t) __builtin_va_arg(v, t)
+#define va_end(v) __builtin_va_end(v)
 
 static volatile uint16_t *VGA = (volatile uint16_t *)VGA_ADDRESS;
 
@@ -81,22 +81,26 @@ static void Screen_ScrollIfNeeded() {
     cursor_y = VGA_HEIGHT - 1;
   }
 }
+
 void putC(const char c) {
-    if (c == '\n') {
+  if (c == '\n') {
+    cursor_x = 0;
+    cursor_y++;
+  } else if (c == '\r') {
+    cursor_x = 0;
+  } else if (c == '\t') {
+    cursor_x += 7;
+    Screen_ScrollIfNeeded();
+  } else {
+    VGA[cursor_y * VGA_WIDTH + cursor_x] = (screen_color << 8) | c;
+    cursor_x++;
+    if (cursor_x >= VGA_WIDTH) {
       cursor_x = 0;
       cursor_y++;
-    } else if (c == '\r') {
-      cursor_x = 0;
-    } else {
-      VGA[cursor_y * VGA_WIDTH + cursor_x] = (screen_color << 8) | c;
-      cursor_x++;
-      if (cursor_x >= VGA_WIDTH) {
-        cursor_x = 0;
-        cursor_y++;
-      }
     }
+  }
 
-    Screen_ScrollIfNeeded();
+  Screen_ScrollIfNeeded();
 }
 
 void putS(const char *msg) {
@@ -122,25 +126,7 @@ void putS(const char *msg) {
 
   Screen_SetCursorPos(cursor_x, cursor_y);
 }
-// Function to set the video mode to 0x13 (VESA 320x200 mode)
-void set_graphics_mode() {
-  __asm__ volatile("mov $0x0013, %%ax\n" // Set video mode 0x13
-                   "int $0x10\n"         // Call BIOS video interrupt
-                   :                     // No output
-                   :                     // No input
-                   : "%ax"               // Clobber register
-  );
-}
 
-// Function to set the video mode to 0x03 (text mode 80x25)
-void set_text_mode() {
-  __asm__ volatile("mov $0x0003, %%ax\n" // Set text mode 0x03 (80x25)
-                   "int $0x10\n"         // Call BIOS video interrupt
-                   :                     // No output
-                   :                     // No input
-                   : "%ax"               // Clobber register
-  );
-}
 void Screen_MoveCursorBack() {
   uint16_t pos = Screen_GetCursorPos();
   if (pos > 0) {
@@ -156,18 +142,23 @@ uint16_t Screen_GetCursorPos() {
   return (high << 8) | low;
 }
 
-void printNum(unsigned int num, int base){
+void disable_cursor() {
+  outb(0x3D4, 0x0A);
+  outb(0x3D5, 0x20);
+}
+
+void printNum(unsigned int num, int base) {
   char buf[32];
   const char *digits = "012345789ABCDEF";
-  int i=0;
+  int i = 0;
 
-  if(num = 0){
+  if (num == 0) {
     putC('0');
     return;
   }
-  while (num>0) {
-    buf[i++] = digits[num%base];
-    num/=base;
+  while (num > 0) {
+    buf[i++] = digits[num % base];
+    num /= base;
   }
   while (i--) {
     putC(buf[i]);
@@ -175,69 +166,72 @@ void printNum(unsigned int num, int base){
 }
 
 void print_number(unsigned int num, int base) {
-    char buf[32];
-    const char *digits = "0123456789ABCDEF";
-    int i = 0;
+  char buf[32];
+  const char *digits = "0123456789ABCDEF";
+  int i = 0;
 
-    if (num == 0) {
-        putC('0');
-        return;
-    }
+  if (num == 0) {
+    putC('0');
+    return;
+  }
 
-    while (num > 0) {
-        buf[i++] = digits[num % base];
-        num /= base;
-    }
+  while (num > 0) {
+    buf[i++] = digits[num % base];
+    num /= base;
+  }
 
-    while (i--) putC(buf[i]);
+  while (i--)
+    putC(buf[i]);
 }
 void printf(const char *fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
+  va_list args;
+  va_start(args, fmt);
 
-    for (; *fmt != 0; fmt++) {
-        if (*fmt != '%') {
-            putC(*fmt);
-            continue;
-        }
-        fmt++; // skip '%'
-
-        switch (*fmt) {
-            case 'c': {
-                char c = (char)va_arg(args, int);
-                putC(c);
-                break;
-            }
-            case 's': {
-                const char *s = va_arg(args, const char *);
-                while (*s) putC(*s++);
-                break;
-            }
-            case 'd':
-            case 'i': {
-                int val = va_arg(args, int);
-                if (val < 0) {
-                    putC('-');
-                    val = -val;
-                }
-                print_number(val, 10);
-                break;
-            }
-            case 'x': {
-                putC('0'); putC('x');
-                print_number(va_arg(args, unsigned int), 16);
-                break;
-            }
-            case 'u': {
-                print_number(va_arg(args, unsigned int), 10);
-                break;
-            }
-            case '%': {
-                putC('%');
-                break;
-            }
-        }
+  for (; *fmt != 0; fmt++) {
+    if (*fmt != '%') {
+      putC(*fmt);
+      continue;
     }
+    fmt++; // skip '%'
 
-    va_end(args);
+    switch (*fmt) {
+    case 'c': {
+      char c = (char)va_arg(args, int);
+      putC(c);
+      break;
+    }
+    case 's': {
+      const char *s = va_arg(args, const char *);
+      while (*s)
+        putC(*s++);
+      break;
+    }
+    case 'd':
+    case 'i': {
+      int val = va_arg(args, int);
+      if (val < 0) {
+        putC('-');
+        val = -val;
+      }
+      print_number(val, 10);
+      break;
+    }
+    case 'x': {
+      putC('0');
+      putC('x');
+      print_number(va_arg(args, unsigned int), 16);
+      break;
+    }
+    case 'u': {
+      print_number(va_arg(args, unsigned int), 10);
+      break;
+    }
+    case '%': {
+      putC('%');
+      break;
+    }
+    }
+  }
+
+  va_end(args);
 }

@@ -31,6 +31,15 @@ uint32_t inl(uint16_t port) {
     return ret;
 }
 
-void io_wait(){
-  outb(0x80, 0);
+void insw(uint16_t port, void* addr,uint32_t count){
+    __asm__ volatile ( "rep insw"
+		       : "+D"(addr), "+c"(count)
+		       : "d"(port)
+		       : "memory");
+}
+
+void io_wait() {
+    for (volatile int i = 0; i < 1000; ++i) {
+        __asm__ volatile ("nop");
+    }
 }

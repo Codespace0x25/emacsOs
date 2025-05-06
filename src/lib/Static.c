@@ -1,12 +1,13 @@
 #include "Static.h"
+#include <stdint.h>
 
 
-static volatile char* UserName_ = "System";
+volatile static  int8_t* UserName_ = "System";
 
 char* GetUserName(){
-  return (char* )UserName_;
+  return (char*)UserName_;
 }
 
 void SetUserName(char* data){
-  UserName_ = (volatile char*)data;
+  UserName_ = data;
 }

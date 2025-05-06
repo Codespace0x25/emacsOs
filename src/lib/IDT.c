@@ -5,6 +5,7 @@
 #include "Static.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include "Def.h"
 
 #define KERNEL_CODE_SEGMENT 0x08 // Assume the kernel code segment is 0x08
 
@@ -59,8 +60,7 @@ void keyboard_handler() {
         putS("\n");
         handle_command(input_buffer);
         buffer_index = 0;
-        putS(GetUserName());
-        putS("> ");
+	putPS1();
       } else {
         if (buffer_index < sizeof(input_buffer) - 1) {
           input_buffer[buffer_index++] = c;
@@ -74,7 +74,6 @@ void keyboard_handler() {
   outb(0x20, 0x20); // Send EOI to PIC
 }
 
-// Set up an entry in the IDT
 void idt_set_gate(uint8_t num, uint32_t base, uint16_t selector,
                   uint8_t flags) {
   idt[num].base_low = (base & 0xFFFF);
@@ -101,15 +100,13 @@ void PIC_remap() {
 // Install the IDT
 void idt_install() {
   // Initialize IDT entries
-
   for (int i = 0; i < IDT_NUM_VECTORS; i++) {
     idt_set_gate(i, 0, 0, 0);
   }
-
   // Set up the keyboard interrupt handler (IRQ1)
   idt_set_gate(0x21, (uint32_t)keyboard_handler_stub, KERNEL_CODE_SEGMENT,
                0x8E);
-  idt_set_gate(14, (uint32_t)page_fault_handler_stub, 0x08, 0x8E);
+  idt_set_gate(14, (uint32_t)page_fault_handler_stub, KERNEL_CODE_SEGMENT, 0x8E);
 
   // Load the IDT
   idt_reg.limit = sizeof(struct idt_entry) * IDT_NUM_VECTORS - 1;

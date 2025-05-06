@@ -1,0 +1,62 @@
+[BITS 32]
+global drop_to_real_and_set_video_mode
+
+section .text
+
+drop_to_real_and_set_video_mode:
+    cli                         ; disable interrupts
+
+    ; Disable Protected Mode
+    mov eax, cr0
+    and eax, 0xFFFFFFFE         ; Clear PE bit
+    mov cr0, eax
+
+    ; Far jump to Real Mode code
+    jmp 0x0000:real_mode_entry  ; Real mode segment:offset
+
+; ---------------------------------------------------------
+; Real Mode 16-bit Code
+; ---------------------------------------------------------
+[BITS 16]
+
+real_mode_entry:
+    ; Set up segment registers for Real Mode
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+    mov sp, 0x7C00              ; Safe stack
+
+    sti                         ; Enable interrupts (BIOS may require this)
+
+    ; --- BIOS interrupt to set video mode ---
+    mov ah, 0x00                ; BIOS: set video mode
+    mov al, 0x03                ; Mode 3: 80x25 text
+    int 0x10
+
+    cli                         ; Disable interrupts again before mode switch
+
+    ; Re-enable Protected Mode
+    mov eax, cr0
+    or eax, 1                   ; Set PE bit
+    mov cr0, eax
+
+    ; Far jump back to 32-bit Protected Mode label
+    jmp 0x08:protected_mode_return  ; 0x08 = Code segment selector in GDT
+
+; ---------------------------------------------------------
+; Back in 32-bit Protected Mode
+; ---------------------------------------------------------
+[BITS 32]
+protected_mode_return:
+    mov ax, 0x10                ; 0x10 = data segment selector
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+
+    sti                         ; Enable interrupts
+    ret                         ; Return to caller

@@ -21,6 +21,8 @@
 
 #define DEFAULT_COLOR VGA_COLOR(WHITE, BLACK)
 
+
+
 void Screen_SetColor(uint8_t fg, uint8_t bg);
 void Screen_DefaltColor();
 void Screen_Clear();
@@ -34,4 +36,5 @@ void Screen_BackSpace();
 void Screen_MoveCursorBack();
 uint16_t Screen_GetCursorPos();
 
+void disable_cursor();
 void printf(const char *fmt, ...) ;

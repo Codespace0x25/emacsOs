@@ -1,4 +1,5 @@
 #include "Music.h"
+#include "PC_Speaker.h"
 
 void play_note(MusicalNote note) {
     pc_speaker_on(note.note);

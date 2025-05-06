@@ -45,3 +45,19 @@ int32_t string_to_int(const char* str){
   }
   return neg ? -result: result;
 }
+void int_to_hex(uint32_t value, char *buf) {
+    static const char *hex_chars = "0123456789ABCDEF";
+    buf[0] = '0';
+    buf[1] = 'x';
+    for (int i = 0; i < 8; ++i) {
+        buf[9 - i] = hex_chars[value & 0xF];
+        value >>= 4;
+    }
+    buf[10] = '\0';
+}
+uint8_t hex_char_to_int(char c) {
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'a' && c <= 'f') return 10 + (c - 'a');
+    if (c >= 'A' && c <= 'F') return 10 + (c - 'A');
+    return 0xFF; // Invalid
+}

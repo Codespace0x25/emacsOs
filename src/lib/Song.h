@@ -6,6 +6,7 @@
 
 typedef struct {
     const char *name;
+    const char *song_name;
     const MusicalNote *notes;
     size_t length;
 } Song;

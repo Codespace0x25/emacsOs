@@ -1,27 +1,29 @@
+#include "lib/ATA.h"
 #include "lib/Allocator.h"
 #include "lib/Com1.h"
 #include "lib/DataPort.h"
+#include "lib/Def.h"
+#include "lib/EXT2.h"
+#include "lib/FrameBuffer.h"
 #include "lib/GDT.h"
 #include "lib/Music.h"
+#include "lib/PCI.h"
 #include "lib/PC_Speaker.h"
-#include "lib/Song.h"
-#include "lib/SoundBlaster.h"
 #include "lib/PIT.h"
 #include "lib/Page.h"
 #include "lib/RTC.h"
 #include "lib/Screen.h"
-#include "lib/PCI.h"
+#include "lib/Song.h"
+#include "lib/SoundBlaster.h"
 #include "lib/Static.h"
 #include "lib/idt.h"
 #include "lib/std/string.h"
-#include "lib/FrameBuffer.h"
-#include "lib/Def.h"
 #include <stdint.h>
 
-
-
-#define HLT while (1);
-#define HEAP_SIZE (1024 * 10) 
+#define HLT                                                                    \
+  while (1)                                                                    \
+    ;
+#define HEAP_SIZE (1024 * 100)
 static uint8_t heap[HEAP_SIZE];
 
 void kernel_main() {
@@ -37,13 +39,25 @@ void kernel_main() {
   allocator_init(heap, HEAP_SIZE);
   pci_scan_bus();
 
-  delay(10000*5);
+  delay(10000 * 5);
   Screen_Clear();
   serial_printf("kernel inited");
 
-  Screen_SetColor(MAGENTA,BLACK);
+  Screen_SetColor(MAGENTA, BLACK);
   printf("welcom to Vlipos\n");
+  Screen_SetColor(YELLOW, BLACK);
+  printf("heep size, %d and it starts at, %x\n", HEAP_SIZE, &heap);
+  Screen_SetColor(BROWN, BLACK);
+  printf("you are loged in as System, you are running at kernel level\n");
+  Screen_DefaltColor();
+  ata_initialize();
+  if (parse_mbr(0)) {
+    printf("EXT2 partition mounted successfully!\n");
+  } else {
+    printf("Failed to find EXT2 partition.\n");
+  }
+
   putPS1();
-  
+
   HLT
 }

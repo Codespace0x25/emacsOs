@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+
 #define BLACK         0x0
 #define BLUE          0x1
 #define GREEN         0x2
@@ -19,9 +20,7 @@
 
 #define VGA_COLOR(fg, bg) ((bg << 4) | (fg))
 
-#define DEFAULT_COLOR VGA_COLOR(WHITE, BLACK)
-
-
+#define DEFAULT_COLOR VGA_COLOR(GREEN, BLACK)
 
 void Screen_SetColor(uint8_t fg, uint8_t bg);
 void Screen_DefaltColor();

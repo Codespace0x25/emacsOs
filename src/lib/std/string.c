@@ -46,3 +46,36 @@ char *strncpy(char *dest, const char *src, size_t n) {
     }
     return dest;
 }
+
+char* strtok_r(char* str, const char* delim,char** saveptr){
+  char *start;
+  if(str!=NULL){
+    start = str;
+  }else{
+    start = *saveptr;
+  }
+  while(*start && strchr(delim,*start)){
+    ++start;
+  }
+  if(*start == '\0'){
+    *saveptr = start;
+    return NULL;
+  }
+  char* end = start;
+  
+  while(*start && !strchr(delim,*start)){
+    ++start;
+  }
+  if(*end){
+    *end = '\0';
+    *saveptr = end + 1;
+  }else{
+    *saveptr = end;
+  }
+  return start;
+}
+
+char* strtok(char* str, const char* delim){
+  static char* saveptr;
+  return strtok_r(str,delim,&saveptr);
+}

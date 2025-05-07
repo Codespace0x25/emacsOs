@@ -18,9 +18,10 @@ typedef struct {
   const char *name;
   const char *help;
   CommandFunction func;
+  const char* manPage;
 } Command;
 
-#define REGISTER_COMMAND(name, help_text, func) {name, help_text, func}
+#define REGISTER_COMMAND(name, help_text, func,ManPage) {name, help_text, func,ManPage}
 
 // --- Forward declarations ---
 void cmd_help(int argc, char **argv);
@@ -34,19 +35,21 @@ void cmd_vim(int argc, char **argv);
 void cmd_music(int argc, char **argv);
 void cmd_sleep(int argc, char **argv);
 void cmd_setColor(int argc, char **argv);
+void cmd_man(int argc, char **argv) ;
 // --- Command list ---
 static Command commands[] = {
-    REGISTER_COMMAND("help", "Show available commands", cmd_help),
-    REGISTER_COMMAND("echo", "Echo the input arguments", cmd_echo),
-    REGISTER_COMMAND("clear", "Clears the screen", cmd_clear),
-    REGISTER_COMMAND("time", "gets the time", cmd_time),
-    REGISTER_COMMAND("beep", "used to play sound", cmd_beep),
-    REGISTER_COMMAND("poweroff", "suths down the pc", cmd_poweroff),
-    REGISTER_COMMAND("exit", "closes the seshioin", cmd_poweroff),
-    REGISTER_COMMAND("vim", "vim", cmd_vim),
-    REGISTER_COMMAND("music", "plays a tuen", cmd_music),
-    REGISTER_COMMAND("sleep", "adds a delay bases in secints", cmd_sleep),
-    REGISTER_COMMAND("color", "sets the color.", cmd_setColor),
+  REGISTER_COMMAND("help", "Show available commands", cmd_help,"this is used to help see the commadns"),
+  REGISTER_COMMAND("echo", "Echo the input arguments", cmd_echo,"this will diaplsy any text put in after it"),
+  REGISTER_COMMAND("clear", "Clears the screen", cmd_clear,"used to clear the screen "),
+  REGISTER_COMMAND("time", "gets the time", cmd_time,"gets local time in 12 haur"),
+  REGISTER_COMMAND("beep", "used to play sound", cmd_beep,"plays a touen based on the input."),
+  REGISTER_COMMAND("poweroff", "suths down the pc", cmd_poweroff,"shuts down the os"),
+  REGISTER_COMMAND("exit", "closes the seshioin", cmd_poweroff,"will exit the os"),
+  REGISTER_COMMAND("vim", "vim", cmd_vim,"text editer, i think???"),
+  REGISTER_COMMAND("music", "plays a tuen", cmd_music,"play music form a list of songs using beeper. must have a beeper on the pc"),
+  REGISTER_COMMAND("sleep", "adds a delay bases in secints", cmd_sleep,"sleeps for amount of secenits set by arg 1"),
+  REGISTER_COMMAND("color", "sets the color.", cmd_setColor, "the dos command for color. works just like it dose in windows"),
+  REGISTER_COMMAND("man", "the comman unix utily", cmd_man, "alows one to find help for each commadn in more detail. comman in unix"),
 };
 
 static const int command_count = sizeof(commands) / sizeof(commands[0]);
@@ -123,7 +126,6 @@ void cmd_echo(int argc, char **argv) {
 void cmd_clear(int argc, char **argv) {
   (void)argc;
   (void)argv;
-
   Screen_Clear();
 }
 
@@ -133,7 +135,7 @@ void cmd_time(int argc, char **argv) {
   uint8_t s, m, h;
   rtc_get_time(&h, &m, &s);
   char *buf;
-  int_to_string(h, buf);
+  int_to_string(h%12, buf);
   putS(buf);
   putS(":");
   int_to_string(m, buf);
@@ -216,4 +218,19 @@ void cmd_setColor(int argc, char **argv) {
     }
 
     Screen_SetColor(fg, bg);
+}
+
+void cmd_man(int argc, char **argv) {
+  if(argc < 2){
+    printf("you must previde a name of a command\n");
+  }
+
+  for (int i = 0; i < command_count; ++i) {
+    if (strcmp(argv[1], commands[i].name) == 0) {
+      Screen_Clear();
+      printf("%s\n",commands[i].manPage);
+      return;
+    }
+  }
+  printf("unable to find page for\n",argv[1]);
 }

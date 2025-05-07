@@ -1,0 +1,6 @@
+#pragma once
+#include <stdint.h>
+
+
+
+void ata_pio_read_sector(uint32_t lba, uint8_t* buffer);

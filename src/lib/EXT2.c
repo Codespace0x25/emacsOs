@@ -16,10 +16,10 @@ static uint8_t ext2_device_index = 0;
 // Corrected block LBA calculator
 uint32_t get_block_lba(uint32_t block) {
     if (block_size == 1024)
-        return lba_start + 2 + block - 1; // SUPERBLOCK is block 1 -> LBA + 2
+      return lba_start + 2 + (block - 1); // SUPERBLOCK is block 1 -> LBA + 2
     return lba_start + block;
 }
-
+// mounst the ext2 part (doent work.)
 bool ext2_mount(uint8_t ata_index, uint32_t lba) {
     ext2_device_index = ata_index;
     lba_start = lba;
@@ -48,7 +48,7 @@ bool ext2_mount(uint8_t ata_index, uint32_t lba) {
     Kerrror("EXT2: mounted on ata%d at LBA %d. Block size: %d\n", ata_index, lba, block_size);
     return true;
 }
-
+// read a inode form the file system. 
 bool ext2_read_inode(uint32_t inode_num, Ext2Inode *inode) {
     uint32_t index = inode_num - 1;
     uint32_t inode_table_block = sb.first_data_block + 5; // Simplified assumption
@@ -143,7 +143,7 @@ bool ext2_read_file(const Ext2Inode *inode, void *buffer, uint32_t buf_size) {
     return true;
 }
 
-// Auto-detect and mount the EXT2 partition from MBR
+// Auto-detect and mount the EXT2 partition from MBR (this should. but it dosent)
 bool parse_mbr(uint32_t drive_index) {
     uint8_t mbr_buf[512];
     ata_pio_read_sector(drive_index, 0, mbr_buf);

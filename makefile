@@ -15,8 +15,8 @@ MOUNTDIR = $(BUILD)/mnt
 TARGET = kernel.bin
 
 # Flags
-CFLAGS  = -ffreestanding -Wall -Wextra -m32 -fno-stack-protector -O0 -target x86_64-unknown-none
-CXXFLAGS = $(CFLAGS) -std=c++20 -fno-exceptions -fno-rtti
+CFLAGS  = -ffreestanding -Wall -Wextra -fno-stack-protector -m32 -O0 -target i386-unknown-none
+CXXFLAGS = $(CFLAGS) -std=c++20 -fno-exceptions -fno-rtti -m32
 LDFLAGS = -T linker.ld -m elf_i386
 
 # Sources

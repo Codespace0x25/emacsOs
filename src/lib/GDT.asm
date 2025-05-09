@@ -1,15 +1,20 @@
-section .text
+[BITS 32]
 global GDT_Load
-
-; GDT_Load(struct GDTPtr* ptr)
+; void GDT_Load(struct GDTPtr* ptr)
 GDT_Load:
-    lgdt [eax]          ; load GDT pointer from eax
-    mov ax, 0x10        ; data segment selector (offset 2 * 8)
+    mov eax, [esp + 4]   ; in 32-bit cdecl, first argument is at [esp + 4]
+    lgdt [eax]
+
+    ; Reload segment registers with data selector (0x10)
+    mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    jmp 0x08:.flush     ; far jump to code selector (offset 1 * 8)
-.flush:
+
+    ; Far jump to flush the instruction pipeline and load CS
+    jmp 0x08:flush
+
+flush:
     ret

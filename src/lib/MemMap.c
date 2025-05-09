@@ -6,7 +6,7 @@ extern uint32_t* page_directory; // your active page directory base
 
 #define PAGE_PRESENT    0x1
 #define PAGE_WRITE      0x2
-#define PAGE_SIZE       0x1000
+#define PAGE_SIZEm       0x1000
 #define PDE_INDEX(x)    (((x) >> 22) & 0x3FF)
 #define PTE_INDEX(x)    (((x) >> 12) & 0x3FF)
 
@@ -29,7 +29,7 @@ void map_physical_range(uint32_t base, uint32_t size) {
     uint32_t aligned_base = base & ~0xFFF;
     uint32_t end = base + size;
 
-    for (uint32_t addr = aligned_base; addr < end; addr += PAGE_SIZE) {
+    for (uint32_t addr = aligned_base; addr < end; addr += PAGE_SIZEm) {
         paging_map((void*)addr, (void*)addr, PAGE_RW);
     }
 }

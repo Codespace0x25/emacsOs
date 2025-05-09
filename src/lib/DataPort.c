@@ -39,7 +39,5 @@ void insw(uint16_t port, void* addr,uint32_t count){
 }
 
 void io_wait() {
-    for (volatile int i = 0; i < 1000; ++i) {
-        __asm__ volatile ("nop");
-    }
+  outb(0x80,0);
 }

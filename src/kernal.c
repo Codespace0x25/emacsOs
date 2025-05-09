@@ -38,10 +38,11 @@ void kernel_main() {
   rtc_enable_periodic_interrupt();
   allocator_init(heap, HEAP_SIZE);
   pci_scan_bus();
+  ata_initialize();
 
   delay(10000 * 5);
   Screen_Clear();
-  serial_printf("kernel inited");
+  serial_printf("Kernal: kernel inited");
 
   Screen_SetColor(MAGENTA, BLACK);
   printf("welcom to Vlipos\n");
@@ -50,11 +51,10 @@ void kernel_main() {
   Screen_SetColor(BROWN, BLACK);
   printf("you are loged in as System, you are running at kernel level\n");
   Screen_DefaltColor();
-  ata_initialize();
-  if (parse_mbr(0)) {
-    printf("EXT2 partition mounted successfully!\n");
+  if (!parse_mbr(0)) {
+    Kerrror("EXT2: init failed.\n");
   } else {
-    printf("Failed to find EXT2 partition.\n");
+    Kerrror("EXT2: ready for file operations.\n");
   }
 
   putPS1();

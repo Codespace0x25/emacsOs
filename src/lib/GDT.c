@@ -19,7 +19,7 @@ struct GDTPtr {
 static struct GDTEntry gdt[3];
 static struct GDTPtr gdt_ptr;
 
-extern void GDT_Load(struct GDTPtr *);
+extern void GDT_Load(struct GDTPtr*);
 
 static void GDT_SetEntry(int idx, uint32_t base, uint32_t limit, uint8_t access,
                          uint8_t gran) {
@@ -35,9 +35,9 @@ void GDT_Install() {
   gdt_ptr.limit = sizeof(gdt) - 1;
   gdt_ptr.base = (uint32_t)&gdt;
 
-  GDT_SetEntry(0, 0, 0, 0, 0);                // Null segment
-  GDT_SetEntry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment
-  GDT_SetEntry(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data segment
+  GDT_SetEntry(0, 0, 0, 0, 0);                        // Null segment
+  GDT_SetEntry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);          // 32-bit code segment
+  GDT_SetEntry(2, 0, 0xFFFFFFFF, 0x92, 0xCF);          // 32-bit data segment
 
   GDT_Load(&gdt_ptr);
 

@@ -23,7 +23,7 @@
 #define HLT                                                                    \
   while (1)                                                                    \
     ;
-#define HEAP_SIZE (1024 * 100)
+#define HEAP_SIZE (1024 * 500)
 static uint8_t heap[HEAP_SIZE];
 
 void kernel_main() {
@@ -51,12 +51,11 @@ void kernel_main() {
   Screen_SetColor(BROWN, BLACK);
   printf("you are loged in as System, you are running at kernel level\n");
   Screen_DefaltColor();
-  if (!parse_mbr(0)) {
+  if (!ext2_mount(0,0)) {
     Kerrror("EXT2: init failed.\n");
   } else {
     Kerrror("EXT2: ready for file operations.\n");
   }
-
   putPS1();
 
   HLT

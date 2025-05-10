@@ -29,7 +29,7 @@ CXX_OBJS     := $(patsubst $(SRC)/%.cpp,$(BUILD)/%.cpp.o,$(CXX_SOURCES))
 ASM_OBJS     := $(patsubst $(SRC)/%.asm,$(BUILD)/%.asm.o,$(ASM_SOURCES))
 OBJS         := $(C_OBJS) $(CXX_OBJS) $(ASM_OBJS)
 
-.PHONY: all clean image run
+.PHONY: all clean image run drive
 
 all: $(IMG)
 
@@ -62,6 +62,8 @@ $(IMG): $(BUILD)/$(TARGET) grub.cfg | makefile
 	cp init.v4 $(BUILD)/iso/bin/
 	grub-mkrescue -o $(IMG) $(BUILD)/iso --modules="video video_bochs video_cirrus gfxterm"
 
+drive:
+	dd 
 # Run in QEMU
 run: $(IMG) makefile
 	./run.sh $(QEMU) $(IMG) $(BUILD)/$(TARGET)

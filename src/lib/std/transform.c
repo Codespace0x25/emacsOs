@@ -61,3 +61,30 @@ uint8_t hex_char_to_int(char c) {
     if (c >= 'A' && c <= 'F') return 10 + (c - 'A');
     return 0xFF; // Invalid
 }
+uint32_t hex_string_to_uint(const char *hex) {
+  uint32_t result = 0;
+  while (*hex) {
+    char c = *hex++;
+    if (c >= '0' && c <= '9') result = (result << 4) | (c - '0');
+    else if (c >= 'A' && c <= 'F') result = (result << 4) | (c - 'A' + 10);
+    else if (c >= 'a' && c <= 'f') result = (result << 4) | (c - 'a' + 10);
+    else return 0; // Invalid
+  }
+  return result;
+}
+uint32_t hex_string_to_int(const char *str) {
+  uint32_t result = 0;
+  while (*str) {
+    char c = *str++;
+    result <<= 4;
+    if (c >= '0' && c <= '9')
+      result |= c - '0';
+    else if (c >= 'A' && c <= 'F')
+      result |= c - 'A' + 10;
+    else if (c >= 'a' && c <= 'f')
+      result |= c - 'a' + 10;
+    else
+      break;
+  }
+  return result;
+}

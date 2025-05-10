@@ -9,3 +9,7 @@ int32_t string_to_int(const char* str);
 void int_to_hex(uint32_t value, char *buf) ;
 
 uint8_t hex_char_to_int(char c);
+
+uint32_t hex_string_to_uint(const char *hex);
+
+uint32_t hex_string_to_int(const char *str);

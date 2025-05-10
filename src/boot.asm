@@ -33,10 +33,6 @@ stack_top:
 
 
 
-	section .data
-Text:
-	db "here is some test",0
-
 	section .text
 	global _start
 

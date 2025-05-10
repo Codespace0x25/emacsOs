@@ -80,4 +80,5 @@ bool ext2_mount(uint8_t ata_index, uint32_t lba_start);
 bool ext2_read_inode(uint32_t inode_num, Ext2Inode* inode);
 bool ext2_find_inode_by_path(const char* path, Ext2Inode* out_inode);
 bool ext2_read_file(const Ext2Inode* inode, void* buffer, uint32_t buf_size);
+char* ext2_read_file_to_string(const Ext2Inode* inode, uint32_t* buf_size);
 bool parse_mbr(uint32_t drive_index);

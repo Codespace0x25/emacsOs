@@ -151,21 +151,25 @@ bool parse_mbr(uint32_t drive_index) {
     MBR *mbr = (MBR *)mbr_buf;
 
     if (mbr->signature != 0xAA55) {
-        Kerrror("MBR: Invalid MBR signature: 0x%x\n", mbr->signature);
+        Kerrror("MBR: Invalid MBR signature: %x\n", mbr->signature);
         return false;
     }
 
     for (int i = 0; i < 4; i++) {
         MBRPartitionEntry *entry = &mbr->partitions[i];
 
-        Kerrror("MBR: Partition %d - Type: %x, LBA: %u\n", i, entry->partition_type, entry->start_lba);
+        Kerrror("MBR: Partition %d - Type: %d, LBA: %u\n", i, entry->partition_type, entry->start_lba);
 
         if (entry->partition_type == PARTITION_TYPE_EXT2) {
-            Kerrror("error: Found EXT2 partition at LBA: %u\n", entry->start_lba);
+            Kerrror("note: Found EXT2 partition at LBA: %u\n", entry->start_lba);
             return ext2_mount(drive_index, entry->start_lba);
         }
     }
 
     Kerrror("No EXT2 partition found.\n");
     return false;
+}
+
+char* ext2_read_file_to_string(const Ext2Inode* inode, uint32_t* buf_size){
+  
 }
